@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: tetris-app
+  namespace: tetris
+  labels:
+    release: kube-prom-stack   # must match the Prometheus Operator's release label
+spec:
+  selector:
+    matchLabels:
+      app: tetris-app
+  namespaceSelector:
+    matchNames: ["tetris"]
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s

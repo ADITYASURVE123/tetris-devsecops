@@ -1,0 +1,42 @@
+# Optional cluster-wide guardrail (install Gatekeeper first via its Helm chart):
+# helm install gatekeeper gatekeeper/gatekeeper -n gatekeeper-system --create-namespace
+#
+# These reject any pod cluster-wide that runs as root or requests privilege
+# escalation - a backstop in case someone bypasses CI and applies manifests by hand.
+
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdenyprivileged
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDenyPrivileged
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sdenyprivileged
+
+        violation[{"msg": msg}] {
+          c := input.review.object.spec.containers[_]
+          c.securityContext.privileged == true
+          msg := sprintf("Container %v must not run privileged", [c.name])
+        }
+
+        violation[{"msg": msg}] {
+          c := input.review.object.spec.containers[_]
+          not c.securityContext.runAsNonRoot == true
+          msg := sprintf("Container %v must set runAsNonRoot: true", [c.name])
+        }
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sDenyPrivileged
+metadata:
+  name: deny-privileged-pods
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces: ["tetris"]

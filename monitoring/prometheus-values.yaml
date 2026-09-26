@@ -1,0 +1,38 @@
+# helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+# helm install kube-prom-stack prometheus-community/kube-prometheus-stack \
+#   -n monitoring --create-namespace -f prometheus-values.yaml
+
+prometheus:
+  prometheusSpec:
+    retention: 15d
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    resources:
+      requests: { cpu: 200m, memory: 512Mi }
+      limits: { cpu: 500m, memory: 1Gi }
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 20Gi
+
+grafana:
+  adminPassword: "" # inject via --set or external secret, never commit a real password
+  persistence:
+    enabled: true
+    storageClassName: gp3
+    size: 5Gi
+  defaultDashboardsEnabled: true
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests: { cpu: 50m, memory: 64Mi }
+      limits: { cpu: 100m, memory: 128Mi }

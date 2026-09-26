@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: tetris-default-deny
+  namespace: tetris
+spec:
+  podSelector: {}
+  policyTypes: ["Ingress", "Egress"]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: tetris-allow-traffic
+  namespace: tetris
+spec:
+  podSelector:
+    matchLabels:
+      app: tetris-app
+  policyTypes: ["Ingress", "Egress"]
+  ingress:
+    - from:
+        - namespaceSelector: {}   # tighten to ingress-controller namespace in prod
+      ports:
+        - port: 8080
+        - port: 9113
+  egress:
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 443
+          protocol: TCP

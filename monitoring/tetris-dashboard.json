@@ -1,0 +1,42 @@
+{
+  "title": "Tetris App - DevSecOps Overview",
+  "uid": "tetris-app-overview",
+  "tags": ["tetris", "devsecops"],
+  "timezone": "browser",
+  "panels": [
+    {
+      "title": "Requests / sec",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        { "expr": "sum(rate(nginx_http_requests_total{namespace=\"tetris\"}[5m]))" }
+      ]
+    },
+    {
+      "title": "Pod Count",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 },
+      "targets": [
+        { "expr": "count(kube_pod_info{namespace=\"tetris\", created_by_name=~\"tetris-app.*\"})" }
+      ]
+    },
+    {
+      "title": "CPU Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        { "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"tetris\"}[5m])) by (pod)" }
+      ]
+    },
+    {
+      "title": "Memory Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        { "expr": "sum(container_memory_working_set_bytes{namespace=\"tetris\"}) by (pod)" }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "version": 1
+}
