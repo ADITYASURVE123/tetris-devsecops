@@ -161,4 +161,4 @@ The Tetris game is now running on AWS EKS with full DevSecOps automation:
 - **Access**: Play the game at the ALB URL obtained in Step 9
 
 > 💡 **Tip**: To see the pipeline in action, make a code change (e.g., update `app/style.css`), commit, and push. Watch Jenkins rebuild, rescan, and ArgoCD auto-sync the new version—all without manual `kubectl apply`!  
-> **Co-Authored-By**: Claude Code <noreply@anthropic.com>
+> **Co-Authored-By**: aditya surve <aditysurve569@gmail.com>
